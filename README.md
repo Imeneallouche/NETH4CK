@@ -15,7 +15,7 @@ pip3 install flask flask-sqlalchemy
 
 
 ## Hierarchy of the repository
-
+```
 NETH4CK/                # main project directory
 ├── env                 # virtual environment folder (created on activation)
 ├── app/                # Application logic
@@ -37,3 +37,4 @@ NETH4CK/                # main project directory
 ├── Procfile            # Heroku process configuration (optional)
 ├── runtime.txt         # Heroku runtime environment (optional)
 └── main.py             # Application entry point (Flask app creation)
+```
