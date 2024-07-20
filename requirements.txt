@@ -4,5 +4,7 @@ Flask-Migrate
 gunicorn
 psutil
 scapy
-sockets
+socketio
 flask-socketio
+netifaces
+python-nmap

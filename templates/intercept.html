@@ -13,7 +13,7 @@
     <div class="container">
       <nav class="navbar">
         <div class="navbar_logo">
-          <a href="{{ url_for('index') }}">
+          <a href="{{ url_for('main.index') }}">
             <img
               class="logo_img"
               src="{{ url_for('static', filename='images/keystone_logo.png') }}"
@@ -49,7 +49,7 @@
         </div>
 
         <form
-          action="{{ url_for('intercept') }}"
+          action="{{ url_for('main.intercept') }}"
           method="POST"
           style="width: 75%"
         >

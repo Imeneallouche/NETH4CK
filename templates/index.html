@@ -13,7 +13,7 @@
     <div class="container">
       <nav class="navbar">
         <div class="navbar_logo">
-          <a href="{{ url_for('index') }}">
+          <a href="{{ url_for('main.index') }}">
             <img
               class="logo_img"
               src="{{ url_for('static', filename='images/keystone_logo.png') }}"
@@ -47,7 +47,7 @@
             quas. In, asperiores. Exercitationem.
           </p>
           <br />
-          <form action="{{ url_for('neth4ck') }}">
+          <form action="{{ url_for('main.neth4ck') }}">
             <button class="header_button" type="submit">Launch</button>
           </form>
         </div>

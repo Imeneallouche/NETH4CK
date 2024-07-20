@@ -1,96 +1,78 @@
-from flask import render_template, request, redirect, url_for, current_app as app
+from flask import Blueprint, render_template, request, redirect, url_for
 import psutil
-import socket
+import netifaces as ni
+import threading
 from scapy.all import sniff, IP
-from threading import Thread
+from . import socketio 
 
-from . import db
-from .models import Todo
+main_bp = Blueprint('main', __name__)
 
+@main_bp.route('/')
+def index():
+    return render_template("index.html")
 
-gateway_info = {"machine_ip": "", "machine_netmask": "", "gateway_ip": "", "gateway_netmask": ""}
-
-
-@app.route('/neth4ck')
+@main_bp.route("/neth4ck")
 def neth4ck():
     interfaces = []
     for interface_name, interface_addresses in psutil.net_if_addrs().items():
-        iface_info = {"name": interface_name, "ip_address": "", "netmask": ""}
+        ip_address = ''
+        netmask = ''
         for address in interface_addresses:
-            if address.family == socket.AF_INET:
-                iface_info["ip_address"] = address.address
-                iface_info["netmask"] = address.netmask
-        interfaces.append(iface_info)
-    return render_template('intercept.html', interfaces=interfaces)
+            if address.family == ni.AF_INET:
+                ip_address = address.address
+                netmask = address.netmask
+        interfaces.append({
+            "name": interface_name,
+            "ip_address": ip_address,
+            "netmask": netmask,
+        })
+    return render_template("intercept.html", interfaces=interfaces)
 
-
-
-@app.route('/intercept', methods=['POST'])
+@main_bp.route("/intercept", methods=["POST"])
 def intercept():
     selected_interface = request.form.get('interface')
-    
-    # Start a thread to sniff traffic on the selected interface
-    thread = Thread(target=sniff_traffic, args=(selected_interface,))
-    thread.start()
+    return redirect(url_for('main.sniff_page', interface=selected_interface))
 
-    return redirect(url_for('sniff', interface=selected_interface))
-
-
-@app.route('/sniff')
-def sniff():
+@main_bp.route("/sniff")
+def sniff_page():
     interface = request.args.get('interface')
-    return render_template('sniff.html', interface=interface, gateway_info=gateway_info)
+    return render_template("sniff.html", interface=interface)
 
-
-
-def sniff_traffic(interface):
-    global gateway_info
-
-    def packet_handler(packet):
-        if IP in packet:
+def sniff_packets(interface):
+    stop_sniffing = threading.Event()
+    
+    def process_packet(packet):
+        if packet.haslayer(IP):
             src_ip = packet[IP].src
             dst_ip = packet[IP].dst
-            machine_ip = psutil.net_if_addrs()[interface][0].address
-            machine_netmask = psutil.net_if_addrs()[interface][0].netmask
-            if not in_same_subnet(src_ip, machine_ip, machine_netmask):
-                gateway_info["machine_ip"] = machine_ip
-                gateway_info["machine_netmask"] = machine_netmask
-                gateway_info["gateway_ip"] = src_ip
-                gateway_info["gateway_netmask"] = machine_netmask  # This would typically require additional logic to determine
+            if not is_private_ip(dst_ip):
+                machine_ip = ni.ifaddresses(interface)[ni.AF_INET][0]['addr']
+                machine_netmask = ni.ifaddresses(interface)[ni.AF_INET][0]['netmask']
+                gateway_ip = ni.gateways()['default'][ni.AF_INET][0]
+                gateway_netmask = machine_netmask  # Assuming a default netmask for simplicity
+                socketio.emit('gateway_info', {
+                    'machine_ip': machine_ip,
+                    'machine_netmask': machine_netmask,
+                    'gateway_ip': gateway_ip,
+                    'gateway_netmask': gateway_netmask
+                })
+                stop_sniffing.set()
+                return False  # Stop sniffing after the first packet
+        return True
 
-    sniff(iface=interface, prn=packet_handler, store=False)
+    sniff(iface=interface, prn=process_packet, store=0, stop_filter=lambda x: stop_sniffing.is_set())
 
-def in_same_subnet(ip1, ip2, netmask):
-    ip1_bin = ''.join([bin(int(x)+256)[3:] for x in ip1.split('.')])
-    ip2_bin = ''.join([bin(int(x)+256)[3:] for x in ip2.split('.')])
-    netmask_bin = ''.join([bin(int(x)+256)[3:] for x in netmask.split('.')])
+def is_private_ip(ip):
+    private_ips = [
+        '10.', '172.16.', '172.17.', '172.18.', '172.19.',
+        '172.20.', '172.21.', '172.22.', '172.23.', '172.24.',
+        '172.25.', '172.26.', '172.27.', '172.28.', '172.29.',
+        '172.30.', '172.31.', '192.168.'
+    ]
+    return any(ip.startswith(private_ip) for private_ip in private_ips)
 
-    ip1_subnet = ''.join(['1' if ip1_bin[i] == netmask_bin[i] == '1' else '0' for i in range(32)])
-    ip2_subnet = ''.join(['1' if ip2_bin[i] == netmask_bin[i] == '1' else '0' for i in range(32)])
-
-    return ip1_subnet == ip2_subnet
-
-
-
-@app.route('/', methods=['POST', 'GET'])
-def index():
-    if request.method == "POST":
-        task_content = request.form['content']
-        new_task = Todo(content=task_content)
-
-        try:
-            db.session.add(new_task)
-            db.session.commit()
-            return redirect('/')
-        except:
-            return "There was an issue with adding your task"
-    else:
-        tasks = Todo.query.order_by(Todo.date_created).all()
-        return render_template("index.html", tasks=tasks)
-
-
-
-
-
-
-
+@socketio.on('start_sniff')
+def handle_start_sniff(data):
+    interface = data['interface']
+    thread = threading.Thread(target=sniff_packets, args=(interface,))
+    thread.start()
