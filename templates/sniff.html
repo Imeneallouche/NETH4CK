@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NETH4CK</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/sniff.js') }}"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar">
+        <div class="navbar_logo">
+          <a href="{{ url_for('index') }}">
+            <img
+              class="logo_img"
+              src="{{ url_for('static', filename='images/keystone_logo.png') }}"
+              alt="keystone_logo"
+            />
+          </a>
+        </div>
+        <div class="navbar_links">
+          <p class="navbar_link">Home</p>
+          <p class="navbar_link">About the Tool</p>
+          <p class="navbar_link">History</p>
+          <p class="navbar_link">Contact Us</p>
+        </div>
+      </nav>
+
+      <div class="header" style="display: flex; flex-direction: column">
+        <div style="display: flex; align-items: center; gap: 20px">
+          <div class="tool_numbers">
+            <h1>2</h1>
+          </div>
+          <h1>Sniffing Interface: {{ interface }}</h1>
+        </div>
+        <div style="width: 50%">
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae
+            nostrum minus neque consequatur provident ipsam impedit ea, suscipit
+            et ipsa. Officia optio dolore deserunt nulla aperiam! Rem aliquam
+            eum obcaecati?
+          </p>
+        </div>
+
+        <div id="loading">
+          <p>Interception is in progress. Please wait...</p>
+        </div>
+        <div id="result" style="display: none">
+          <h2>Interception Result:</h2>
+          <p>Machine IP: <span id="machine_ip"></span></p>
+          <p>Machine Netmask: <span id="machine_netmask"></span></p>
+          <p>Gateway IP: <span id="gateway_ip"></span></p>
+          <p>Gateway Netmask: <span id="gateway_netmask"></span></p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NETH4CK</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar">
+        <div class="navbar_logo">
+          <a href="{{ url_for('index') }}">
+            <img
+              class="logo_img"
+              src="{{ url_for('static', filename='images/keystone_logo.png') }}"
+              alt="keystone_logo"
+            />
+          </a>
+        </div>
+        <div class="navbar_links">
+          <p class="navbar_link">Home</p>
+          <p class="navbar_link">About the Tool</p>
+          <p class="navbar_link">History</p>
+          <p class="navbar_link">Contact Us</p>
+        </div>
+      </nav>
+
+      <div
+        class="header"
+        style="display: flex; flex-direction: column;"
+      >
+        <div style="display: flex; align-items: center; gap: 20px">
+          <div class="tool_numbers">
+            <h1>1</h1>
+          </div>
+          <h1>Network Interfaces</h1>
+        </div>
+        <div style="width: 50%">
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae
+            nostrum minus neque consequatur provident ipsam impedit ea, suscipit
+            et ipsa. Officia optio dolore deserunt nulla aperiam! Rem aliquam
+            eum obcaecati?
+          </p>
+        </div>
+
+        <form
+          action="{{ url_for('intercept') }}"
+          method="POST"
+          style="width: 75%"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Interface Name</th>
+                <th>IP Address</th>
+                <th>Netmask</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for interface in interfaces %}
+              <tr>
+                <td>
+                  <input
+                    type="radio"
+                    name="interface"
+                    value="{{ interface.name }}"
+                  />
+                </td>
+                <td>{{ interface.name }}</td>
+                <td>{{ interface.ip_address }}</td>
+                <td>{{ interface.netmask }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <button type="submit" class="header_button">Intercept</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
