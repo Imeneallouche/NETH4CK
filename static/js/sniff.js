@@ -13,5 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("gateway_netmask").innerText = data.gateway_netmask;
     document.getElementById("loading").style.display = "none";
     document.getElementById("result").style.display = "block";
+
+    var scanButton = document.createElement("button");
+    scanButton.innerText = "Scan for Available IPs";
+    scanButton.addEventListener("click", function () {
+      window.location.href = "/available_ips?gateway_ip=" + data.gateway_ip;
+    });
+    document.getElementById("result").appendChild(scanButton);
   });
 });

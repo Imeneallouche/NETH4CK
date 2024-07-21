@@ -8,3 +8,5 @@ socketio
 flask-socketio
 netifaces
 python-nmap
+logging
+os

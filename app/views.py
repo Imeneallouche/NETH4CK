@@ -3,9 +3,57 @@ import psutil
 import netifaces as ni
 import threading
 from scapy.all import sniff, IP
-from . import socketio 
+from . import socketio
+import nmap
+import logging
+from flask_socketio import emit
+from app import socketio
+
+logging.basicConfig(level=logging.DEBUG)
 
 main_bp = Blueprint('main', __name__)
+
+@socketio.on('start_ip_scan')
+def handle_start_ip_scan(data):
+    gateway_ip = data['gateway_ip']
+    scan_network(gateway_ip)
+
+def scan_network(gateway_ip):
+    nm = nmap.PortScanner()
+    # Calculate the /24 subnet
+    ip_parts = gateway_ip.split('.')
+    network = f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.0/24"
+    nm.scan(hosts=network, arguments='-sn')
+
+    occupied_ips = []
+    for host in nm.all_hosts():
+        if 'up' in nm[host].state():
+            occupied_ips.append(host)
+            socketio.emit('occupied_ip', {'ip': host})
+
+    # Emit signal when the scan is complete
+    socketio.emit('scan_complete', {'occupied_ips': occupied_ips})
+
+
+
+
+@main_bp.route("/free_ips")
+def free_ips():
+    gateway_ip = request.args.get("gateway_ip")
+    occupied_ips_str = request.args.get("occupied_ips")
+    occupied_ips = occupied_ips_str.split(',') if occupied_ips_str else []
+
+    # Calculate the /24 subnet
+    ip_parts = gateway_ip.split('.')
+    base_ip = f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}."
+
+    all_ips = [f"{base_ip}{i}" for i in range(1, 255)]
+    free_ips = [ip for ip in all_ips if ip not in occupied_ips]
+
+    return render_template("free_ips.html", free_ips=free_ips)
+
+
+
 
 @main_bp.route('/')
 def index():
@@ -37,6 +85,11 @@ def intercept():
 def sniff_page():
     interface = request.args.get('interface')
     return render_template("sniff.html", interface=interface)
+
+@main_bp.route("/available_ips")
+def available_ips_page():
+    gateway_ip = request.args.get('gateway_ip')
+    return render_template("available_ips.html", gateway_ip=gateway_ip)
 
 def sniff_packets(interface):
     stop_sniffing = threading.Event()
@@ -70,6 +123,16 @@ def is_private_ip(ip):
         '172.30.', '172.31.', '192.168.'
     ]
     return any(ip.startswith(private_ip) for private_ip in private_ips)
+
+def in_same_subnet(ip1, ip2, netmask):
+    ip1_bin = ''.join([bin(int(x)+256)[3:] for x in ip1.split('.')])
+    ip2_bin = ''.join([bin(int(x)+256)[3:] for x in ip2.split('.')])
+    netmask_bin = ''.join([bin(int(x)+256)[3:] for x in netmask.split('.')])
+
+    ip1_subnet = ''.join(['1' if ip1_bin[i] == netmask_bin[i] == '1' else '0' for i in range(32)])
+    ip2_subnet = ''.join(['1' if ip2_bin[i] == netmask_bin[i] == '1' else '0' for i in range(32)])
+
+    return ip1_subnet == ip2_subnet
 
 @socketio.on('start_sniff')
 def handle_start_sniff(data):

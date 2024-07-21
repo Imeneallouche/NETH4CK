@@ -3,9 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NETH4CK</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/sniff.js') }}"></script>
+    <title>Free IPs</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/styles.css') }}"
@@ -31,16 +29,14 @@
         </div>
       </nav>
 
-      <div
-        class="header"
-        style="display: flex; flex-direction: column; gap: 1rem"
-      >
+      <div class="header" style="display: flex; flex-direction: column">
         <div style="display: flex; align-items: center; gap: 20px">
           <div class="tool_numbers">
-            <h1>2</h1>
+            <h1>4</h1>
           </div>
-          <h1>Sniffing Interface: {{ interface }}</h1>
+          <h1>Free IPs</h1>
         </div>
+
         <div style="width: 50%">
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae
@@ -49,35 +45,27 @@
             eum obcaecati?
           </p>
         </div>
-        <h1 id="loading">Interception loading... please wait</h1>
-        <div id="result" style="display: none; width: 50%">
-          <table>
-            <thead>
-              <tr>
-                <th>Information</th>
-                <th>Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Machine IP</td>
-                <td><span id="machine_ip"></span></td>
-              </tr>
-              <tr>
-                <td>Machine Netmask</td>
-                <td><span id="machine_netmask"></span></td>
-              </tr>
-              <tr>
-                <td>Gateway IP</td>
-                <td><span id="gateway_ip"></span></td>
-              </tr>
-              <tr>
-                <td>Gateway Netmask</td>
-                <td><span id="gateway_netmask"></span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in range(0, free_ips|length, 6) %}
+            <tr>
+              {% for j in range(i, i+6) %}
+              <td>{{ free_ips[j] if j < free_ips|length else '' }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </body>
