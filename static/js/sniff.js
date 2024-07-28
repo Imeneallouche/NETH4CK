@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var scanButton = document.createElement("button");
     scanButton.innerText = "Scan for Available IPs";
+    scanButton.classList.add("header_button");
     scanButton.addEventListener("click", function () {
       window.location.href = "/available_ips?gateway_ip=" + data.gateway_ip;
     });

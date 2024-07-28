@@ -1,51 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Available IPs</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      var socket = io.connect(
-        "http://" + window.location.hostname + ":" + window.location.port
-      );
-
-      var occupiedIps = [];
-      var params = new URLSearchParams(window.location.search);
-      var gateway_ip = params.get("gateway_ip");
-
-      socket.on("occupied_ip", function (data) {
-        occupiedIps.push(data.ip);
-        var ul = document.getElementById("occupied_ips");
-        var li = document.createElement("li");
-        li.appendChild(document.createTextNode(data.ip));
-        ul.appendChild(li);
-      });
-
-      socket.on("scan_complete", function (data) {
-        // Show the button when the scan is complete
-        var showAvailableIpsButton = document.createElement("button");
-        showAvailableIpsButton.innerText = "Available IPs";
-        showAvailableIpsButton.classList.add("header_button");
-        showAvailableIpsButton.addEventListener("click", function () {
-          var occupiedIpsStr = occupiedIps.join(',');
-          window.location.href = "/free_ips?gateway_ip=" + gateway_ip + "&occupied_ips=" + occupiedIpsStr;
-        });
-
-        var container = document.querySelector(".container");
-        // Append the button to the container
-        container.appendChild(showAvailableIpsButton);
-      });
-
-      // Emit a message to start scanning for IPs
-      socket.emit("start_ip_scan", {
-        gateway_ip: gateway_ip
-      });
-    });
-  </script>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Available IPs</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
+  </head>
   <body>
     <div class="container">
       <nav class="navbar">
@@ -66,16 +30,14 @@
         </div>
       </nav>
 
-      <div
-        class="header"
-        style="display: flex; flex-direction: column; gap: 1rem"
-      >
+      <div class="header" style="display: flex; flex-direction: column">
         <div style="display: flex; align-items: center; gap: 20px">
           <div class="tool_numbers">
             <h1>3</h1>
           </div>
           <h1>Available IPs</h1>
         </div>
+
         <div style="width: 50%">
           <p>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae
@@ -84,11 +46,71 @@
             eum obcaecati?
           </p>
         </div>
-        <div id="occupied_ips_list">
-          <h2>Occupied IP Addresses</h2>
-          <ul id="occupied_ips"></ul>
-        </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody id="occupied_ips_table">
+              <!-- Occupied IPs will be inserted here -->
+            </tbody>
+          </table>
+        <div class="button-container"></div>
       </div>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var socket = io.connect(
+          "http://" + window.location.hostname + ":" + window.location.port
+        );
+        var occupiedIps = [];
+        var params = new URLSearchParams(window.location.search);
+        var gateway_ip = params.get("gateway_ip");
+
+        socket.on("occupied_ip", function (data) {
+          occupiedIps.push(data.ip);
+          var tbody = document.getElementById("occupied_ips_table");
+          if (tbody) {
+            var row;
+            if (occupiedIps.length % 6 === 1) {
+              row = document.createElement("tr");
+              tbody.appendChild(row);
+            } else {
+              row = tbody.lastElementChild;
+            }
+            var cell = document.createElement("td");
+            cell.textContent = data.ip;
+            row.appendChild(cell);
+          }
+        });
+
+        socket.on("scan_complete", function () {
+          var buttonContainer = document.querySelector(".button-container");
+          if (buttonContainer) {
+            var showAvailableIpsButton = document.createElement("button");
+            showAvailableIpsButton.innerText = "Discover Free IPs";
+            showAvailableIpsButton.classList.add("header_button");
+            showAvailableIpsButton.addEventListener("click", function () {
+              var occupiedIpsStr = occupiedIps.join(",");
+              window.location.href =
+                "/free_ips?gateway_ip=" +
+                gateway_ip +
+                "&occupied_ips=" +
+                occupiedIpsStr;
+            });
+            buttonContainer.appendChild(showAvailableIpsButton);
+          }
+        });
+
+        socket.emit("start_ip_scan", { gateway_ip: gateway_ip });
+      });
+    </script>
   </body>
 </html>
