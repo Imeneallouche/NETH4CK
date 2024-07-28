@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Configuration Termination</title>
+    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Configuration on process...</h1>
+    <p>Interface: <span id="interface">{{ interface }}</span></p>
+    <p>IP Address: <span id="selected_ip">{{ selected_ip }}</span></p>
+    <p>Netmask: <span id="netmask">{{ netmask }}</span></p>
+
+    <script>
+        $(document).ready(function() {
+            $.get("{{ url_for('main.check_configuration_status') }}", function(data) {
+                if (data.status === 'done') {
+                    $('h1').text('Configuration terminated! Check using the command ip a in your terminal');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

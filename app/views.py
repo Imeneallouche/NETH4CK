@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 import psutil
 import netifaces as ni
 import threading
@@ -7,7 +7,7 @@ from . import socketio
 import nmap
 import logging
 from flask_socketio import emit
-from app import socketio
+import subprocess
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -34,9 +34,6 @@ def scan_network(gateway_ip):
     # Emit signal when the scan is complete
     socketio.emit('scan_complete', {'occupied_ips': occupied_ips})
 
-
-
-
 @main_bp.route("/free_ips")
 def free_ips():
     gateway_ip = request.args.get("gateway_ip")
@@ -50,10 +47,39 @@ def free_ips():
     all_ips = [f"{base_ip}{i}" for i in range(1, 255)]
     free_ips = [ip for ip in all_ips if ip not in occupied_ips]
 
-    return render_template("free_ips.html", free_ips=free_ips)
+    return render_template("free_ips.html", free_ips=free_ips, gateway_ip=gateway_ip)
 
+@main_bp.route("/config_termination")
+def config_termination():
+    interface = request.args.get('interface')
+    selected_ip = request.args.get('selected_ip')
+    netmask = request.args.get('netmask')
+    return render_template('config_termination.html', interface=interface, selected_ip=selected_ip, netmask=netmask)
 
+@main_bp.route("/configure_ip", methods=["POST"])
+def configure_ip():
+    interface = request.form.get('interface')
+    selected_ip = request.form.get('selected_ip')
+    netmask = request.form.get('netmask')
 
+    if not interface or not selected_ip or not netmask:
+        return "Missing parameters", 400
+
+    commands = [
+        f"sudo ip addr flush dev {interface}",
+        f"sudo ip addr add {selected_ip}/{netmask} dev {interface}",
+        f"sudo ip link set {interface} up"
+    ]
+
+    for cmd in commands:
+        subprocess.run(cmd, shell=True, check=True)
+
+    return "Configuration complete", 200
+
+@main_bp.route('/check_configuration_status')
+def check_configuration_status():
+    # This route will be used to check the status of the configuration
+    return jsonify({'status': 'done'})
 
 @main_bp.route('/')
 def index():
@@ -93,7 +119,7 @@ def available_ips_page():
 
 def sniff_packets(interface):
     stop_sniffing = threading.Event()
-    
+
     def process_packet(packet):
         if packet.haslayer(IP):
             src_ip = packet[IP].src

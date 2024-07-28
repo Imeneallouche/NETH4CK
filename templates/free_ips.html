@@ -45,28 +45,94 @@
             eum obcaecati?
           </p>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>IP Address</th>
-              <th>IP Address</th>
-              <th>IP Address</th>
-              <th>IP Address</th>
-              <th>IP Address</th>
-              <th>IP Address</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for i in range(0, free_ips|length, 6) %}
-            <tr>
-              {% for j in range(i, i+6) %}
-              <td>{{ free_ips[j] if j < free_ips|length else '' }}</td>
+
+        <form
+          id="configure_ip_form"
+          style="width: 100%"
+          action="{{ url_for('main.configure_ip') }}"
+          method="POST"
+        >
+          <input
+            type="hidden"
+            name="interface"
+            value="{{ request.args.get('interface') }}"
+          />
+          <input
+            type="hidden"
+            name="gateway_ip"
+            value="{{ request.args.get('gateway_ip') }}"
+          />
+          <input
+            type="hidden"
+            name="netmask"
+            value="{{ request.args.get('netmask') }}"
+          />
+          <table>
+            <thead>
+              <tr>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in range(0, free_ips|length, 6) %}
+              <tr>
+                {% for j in range(i, i+6) %}
+                <td>
+                  {% if j < free_ips|length %}
+                  <label>
+                    <input
+                      type="radio"
+                      name="selected_ip"
+                      value="{{ free_ips[j] }}"
+                    />
+                    {{ free_ips[j] }}
+                  </label>
+                  {% endif %}
+                </td>
+                {% endfor %}
+              </tr>
               {% endfor %}
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+          <div class="button-container">
+            <button type="submit" class="header_button">Configure IP</button>
+          </div>
+        </form>
       </div>
     </div>
+
+    <script>
+      document
+        .getElementById("configure_ip_form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          var form = event.target;
+          var formData = new FormData(form);
+          
+          fetch(form.action, {
+            method: form.method,
+            body: formData,
+          })
+            .then((response) => response.text())
+            .then((data) => {
+              var interface = formData.get("interface");
+              var selected_ip = formData.get("selected_ip");
+              var netmask = formData.get("netmask");
+              window.location.href =
+                "{{ url_for('main.config_termination') }}?interface=" +
+                interface +
+                "&selected_ip=" +
+                selected_ip +
+                "&netmask=" +
+                netmask;
+            });
+        });
+    </script>
   </body>
 </html>
+
