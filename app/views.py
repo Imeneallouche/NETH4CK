@@ -53,21 +53,23 @@ def free_ips():
 def config_termination():
     interface = request.args.get('interface')
     selected_ip = request.args.get('selected_ip')
-    netmask = request.args.get('netmask')
-    return render_template('config_termination.html', interface=interface, selected_ip=selected_ip, netmask=netmask)
+    gateway_netmask = request.args.get('gateway_netmask')
+    gateway_ip = request.args.get('gateway_ip')
+    return render_template('config_termination.html', interface=interface, selected_ip=selected_ip, gateway_netmask=gateway_netmask, gateway_ip=gateway_ip)
+
 
 @main_bp.route("/configure_ip", methods=["POST"])
 def configure_ip():
     interface = request.form.get('interface')
     selected_ip = request.form.get('selected_ip')
-    netmask = request.form.get('netmask')
+    gateway_netmask = request.form.get('gateway_netmask')
 
-    if not interface or not selected_ip or not netmask:
+    if not interface or not selected_ip or not gateway_netmask:
         return "Missing parameters", 400
 
     commands = [
         f"sudo ip addr flush dev {interface}",
-        f"sudo ip addr add {selected_ip}/{netmask} dev {interface}",
+        f"sudo ip addr add {selected_ip}/{gateway_netmask} dev {interface}",
         f"sudo ip link set {interface} up"
     ]
 
@@ -165,3 +167,4 @@ def handle_start_sniff(data):
     interface = data['interface']
     thread = threading.Thread(target=sniff_packets, args=(interface,))
     thread.start()
+

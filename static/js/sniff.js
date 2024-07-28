@@ -18,7 +18,13 @@ document.addEventListener("DOMContentLoaded", function () {
     scanButton.innerText = "Scan for Available IPs";
     scanButton.classList.add("header_button");
     scanButton.addEventListener("click", function () {
-      window.location.href = "/available_ips?gateway_ip=" + data.gateway_ip;
+      window.location.href =
+        "/available_ips?gateway_ip=" +
+        data.gateway_ip +
+        "&interface=" +
+        interface +
+        "&gateway_netmask=" +
+        data.gateway_netmask;
     });
     document.getElementById("result").appendChild(scanButton);
   });

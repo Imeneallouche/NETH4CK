@@ -73,6 +73,8 @@
         var occupiedIps = [];
         var params = new URLSearchParams(window.location.search);
         var gateway_ip = params.get("gateway_ip");
+        var interface = params.get("interface");
+        var gateway_netmask = params.get("gateway_netmask");
 
         socket.on("occupied_ip", function (data) {
           occupiedIps.push(data.ip);
@@ -100,10 +102,10 @@
             showAvailableIpsButton.addEventListener("click", function () {
               var occupiedIpsStr = occupiedIps.join(",");
               window.location.href =
-                "/free_ips?gateway_ip=" +
-                gateway_ip +
-                "&occupied_ips=" +
-                occupiedIpsStr;
+                "/free_ips?interface=" + interface + 
+                "&gateway_ip=" + gateway_ip +
+                "&gateway_netmask=" + gateway_netmask +
+                "&occupied_ips=" + occupiedIpsStr;
             });
             buttonContainer.appendChild(showAvailableIpsButton);
           }

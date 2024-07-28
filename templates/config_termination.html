@@ -6,10 +6,11 @@
     <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1>Configuration on process...</h1>
+    <h1>Configuration in process...</h1>
     <p>Interface: <span id="interface">{{ interface }}</span></p>
     <p>IP Address: <span id="selected_ip">{{ selected_ip }}</span></p>
-    <p>Netmask: <span id="netmask">{{ netmask }}</span></p>
+    <p>gateway_netmask: <span id="gateway_netmask">{{ gateway_netmask }}</span></p>
+    <p>Gateway IP: <span id="gateway_ip">{{ gateway_ip }}</span></p>
 
     <script>
         $(document).ready(function() {
@@ -22,4 +23,5 @@
     </script>
 </body>
 </html>
+
 
