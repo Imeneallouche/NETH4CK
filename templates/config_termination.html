@@ -1,27 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Configuration Termination</title>
     <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <h1>Configuration in process...</h1>
-    <p>Interface: <span id="interface">{{ interface }}</span></p>
-    <p>IP Address: <span id="selected_ip">{{ selected_ip }}</span></p>
-    <p>gateway_netmask: <span id="gateway_netmask">{{ gateway_netmask }}</span></p>
-    <p>Gateway IP: <span id="gateway_ip">{{ gateway_ip }}</span></p>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar">
+        <div class="navbar_logo">
+          <a href="{{ url_for('main.index') }}">
+            <img
+              class="logo_img"
+              src="{{ url_for('static', filename='images/keystone_logo.png') }}"
+              alt="keystone_logo"
+            />
+          </a>
+        </div>
+        <div class="navbar_links">
+          <p class="navbar_link">Home</p>
+          <p class="navbar_link">About the Tool</p>
+          <p class="navbar_link">History</p>
+          <p class="navbar_link">Contact Us</p>
+        </div>
+      </nav>
 
+      <div
+        class="header"
+        style="display: flex; flex-direction: column; gap: 1rem"
+      >
+        <div style="display: flex; align-items: center; gap: 20px">
+          <div class="tool_numbers">
+            <h1>5</h1>
+          </div>
+          <h1 class="update_title">Configuration in process...</h1>
+        </div>
+        <div style="width: 50%">
+          <p>
+            The interferface selected
+            <span class="update_text"> will be </span>updated with the following
+            static IP address and mask , you can check it out using the command
+            <span style="color: #f00">$ ip a</span>
+          </p>
+        </div>
+
+        <table style="width: 50%">
+          <thead>
+            <tr>
+              <th>Information</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Interface</td>
+              <td><span id="interface">{{ interface }}</span></td>
+            </tr>
+            <tr>
+              <td>IP Address</td>
+              <td><span id="selected_ip">{{ selected_ip }}</span></td>
+            </tr>
+            <tr>
+              <td>Gateway Netmask</td>
+              <td><span id="gateway_netmask">{{ gateway_netmask }}</span></td>
+            </tr>
+            <tr>
+              <td>Gateway IP</td>
+              <td><span id="gateway_ip">{{ gateway_ip }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <script>
-        $(document).ready(function() {
-            $.get("{{ url_for('main.check_configuration_status') }}", function(data) {
-                if (data.status === 'done') {
-                    $('h1').text('Configuration terminated! Check using the command ip a in your terminal');
-                }
-            });
-        });
+      $(document).ready(function () {
+        $.get(
+          "{{ url_for('main.check_configuration_status') }}",
+          function (data) {
+            if (data.status === "done") {
+              $(".update_title").text("Configuration terminated!");
+              $(".update_text").text("has been");
+            }
+          }
+        );
+      });
     </script>
-</body>
+  </body>
 </html>
-
-
