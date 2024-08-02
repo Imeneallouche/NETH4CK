@@ -1,84 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NETH4CK</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/sniff.js') }}"></script>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
-    />
-  </head>
-  <body>
-    <div class="container">
-      <nav class="navbar">
-        <div class="navbar_logo">
-          <a href="{{ url_for('main.index') }}">
-            <img
-              class="logo_img"
-              src="{{ url_for('static', filename='images/keystone_logo.png') }}"
-              alt="keystone_logo"
-            />
-          </a>
-        </div>
-        <div class="navbar_links">
-          <p class="navbar_link">Home</p>
-          <p class="navbar_link">About the Tool</p>
-          <p class="navbar_link">History</p>
-          <p class="navbar_link">Contact Us</p>
-        </div>
-      </nav>
+{% extends "base.html" %}
 
-      <div
-        class="header"
-        style="display: flex; flex-direction: column; gap: 1rem"
-      >
-        <div style="display: flex; align-items: center; gap: 20px">
-          <div class="tool_numbers">
-            <h1>2</h1>
-          </div>
-          <h1>Sniffing Interface: {{ interface }}</h1>
-        </div>
-        <div style="width: 50%">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae
-            nostrum minus neque consequatur provident ipsam impedit ea, suscipit
-            et ipsa. Officia optio dolore deserunt nulla aperiam! Rem aliquam
-            eum obcaecati?
-          </p>
-        </div>
-        <h1 id="loading">Interception loading... please wait</h1>
-        <div id="result" style="display: none; width: 50%">
-          <table>
-            <thead>
-              <tr>
-                <th>Information</th>
-                <th>Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Machine IP</td>
-                <td><span id="machine_ip"></span></td>
-              </tr>
-              <tr>
-                <td>Machine Netmask</td>
-                <td><span id="machine_netmask"></span></td>
-              </tr>
-              <tr>
-                <td>Gateway IP</td>
-                <td><span id="gateway_ip"></span></td>
-              </tr>
-              <tr>
-                <td>Gateway Netmask</td>
-                <td><span id="gateway_netmask"></span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+{% block title %}Sniffing Interface{% endblock %}
+
+{% block content %}
+<div class="header" style="display: flex; flex-direction: column; gap: 1rem">
+  <div style="display: flex; align-items: center; gap: 20px">
+    <div class="tool_numbers">
+      <h1>2</h1>
     </div>
-  </body>
-</html>
+    <h1>Sniffing Interface: {{ interface }}</h1>
+  </div>
+  <div style="width: 50%">
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae
+      nostrum minus neque consequatur provident ipsam impedit ea, suscipit
+      et ipsa. Officia optio dolore deserunt nulla aperiam! Rem aliquam
+      eum obcaecati?
+    </p>
+  </div>
+  <h1 id="loading">Interception loading... please wait</h1>
+  <div id="result" style="display: none; width: 50%">
+    <table>
+      <thead>
+        <tr>
+          <th>Information</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Machine IP</td>
+          <td><span id="machine_ip"></span></td>
+        </tr>
+        <tr>
+          <td>Machine Netmask</td>
+          <td><span id="machine_netmask"></span></td>
+        </tr>
+        <tr>
+          <td>Gateway IP</td>
+          <td><span id="gateway_ip"></span></td>
+        </tr>
+        <tr>
+          <td>Gateway Netmask</td>
+          <td><span id="gateway_netmask"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/sniff.js') }}"></script>
+{% endblock %}

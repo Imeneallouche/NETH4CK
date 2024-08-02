@@ -1,60 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Keystone Home</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
+{% extends "base.html" %} {% block title %}Keystone Home{% endblock %} {% block
+content %}
+<div class="header">
+  <div class="header_content">
+    <h1 class="header_title">
+      Welcome to <span style="color: #f00">NETH4CK</span>
+    </h1>
+    <br />
+    <p class="header_paragraph">
+      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nam quae quis
+      consequatur optio? Tenetur error nihil reiciendis fugit quos, mollitia
+      doloribus ipsum sunt dolores, nulla quas consequuntur molestias
+      perferendis doloremque.
+    </p>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad nemo
+      praesentium voluptates quisquam sint repellendus inventore id explicabo,
+      omnis dolorem nam iste fuga exercitationem vero veniam quas. In,
+      asperiores. Exercitationem.
+    </p>
+    <br />
+    <form action="{{ url_for('main.neth4ck') }}">
+      <button class="header_button" type="submit">Launch</button>
+    </form>
+  </div>
+  <div class="header_image">
+    <img
+      src="{{ url_for('static', filename='images/header_image.png') }}"
+      alt="header"
     />
-  </head>
-  <body>
-    <div class="container">
-      <nav class="navbar">
-        <div class="navbar_logo">
-          <a href="{{ url_for('main.index') }}">
-            <img
-              class="logo_img"
-              src="{{ url_for('static', filename='images/keystone_logo.png') }}"
-              alt="keystone_logo"
-            />
-          </a>
-        </div>
-        <div class="navbar_links">
-          <p class="navbar_link">Home</p>
-          <p class="navbar_link">About the Tool</p>
-          <p class="navbar_link">History</p>
-          <p class="navbar_link">Contact Us</p>
-        </div>
-      </nav>
-      <div class="header">
-        <div class="header_content">
-          <h1 class="header_title">
-            Welcome to <span style="color: #f00">NETH4CK</span>
-          </h1>
-          <br />
-          <p class="header_paragraph">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nam quae
-            quis consequatur optio? Tenetur error nihil reiciendis fugit quos,
-            mollitia doloribus ipsum sunt dolores, nulla quas consequuntur
-            molestias perferendis doloremque.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad nemo
-            praesentium voluptates quisquam sint repellendus inventore id
-            explicabo, omnis dolorem nam iste fuga exercitationem vero veniam
-            quas. In, asperiores. Exercitationem.
-          </p>
-          <br />
-          <form action="{{ url_for('main.neth4ck') }}">
-            <button class="header_button" type="submit">Launch</button>
-          </form>
-        </div>
-        <div class="header_image">
-          <img src="../static/images/header_image.png" alt="header" />
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}

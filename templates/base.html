@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}NETH4CK{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navbar">
+        <div class="navbar_logo">
+          <a href="{{ url_for('main.index') }}">
+            <img
+              class="logo_img"
+              src="{{ url_for('static', filename='images/keystone_logo.png') }}"
+              alt="keystone_logo"
+            />
+          </a>
+        </div>
+        <div class="navbar_links">
+          <p class="navbar_link">Home</p>
+          <p class="navbar_link">About the Tool</p>
+          <p class="navbar_link">History</p>
+          <p class="navbar_link">Contact Us</p>
+        </div>
+      </nav>
+
+      {% block content %}
+      <!-- Content will be injected here -->
+      {% endblock %}
+    </div>
+  </body>
+</html>

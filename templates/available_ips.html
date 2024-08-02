@@ -10,7 +10,6 @@
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/available_ips.js') }}"></script>
-
   </head>
   <body>
     <div class="container">
@@ -49,24 +48,23 @@
           </p>
         </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>IP Address</th>
-                <th>IP Address</th>
-                <th>IP Address</th>
-                <th>IP Address</th>
-                <th>IP Address</th>
-                <th>IP Address</th>
-              </tr>
-            </thead>
-            <tbody id="occupied_ips_table">
-              <!-- Occupied IPs will be inserted here -->
-            </tbody>
-          </table>
+        <table>
+          <thead>
+            <tr>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody id="occupied_ips_table">
+            <!-- Occupied IPs will be inserted here -->
+          </tbody>
+        </table>
         <div class="button-container"></div>
       </div>
     </div>
-
   </body>
 </html>
