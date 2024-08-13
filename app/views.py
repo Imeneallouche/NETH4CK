@@ -114,6 +114,56 @@ def sniff_page():
     interface = request.args.get('interface')
     return render_template("sniff.html", interface=interface)
 
+
+
+@main_bp.route('/network_pentesting')
+def network_pentesting():
+    interfaces = []
+    for interface_name, interface_addresses in psutil.net_if_addrs().items():
+        for address in interface_addresses:
+            if address.family == ni.AF_INET:
+                interfaces.append(interface_name)
+    return render_template('netpentest.html', interfaces=interfaces)
+
+
+@main_bp.route('/configure_responder', methods=['POST'])
+def configure_responder():
+    options = request.form
+
+    # Extracting the user-selected options
+    config = {
+        "Analyze": 'analyze' in options,
+        "Interface": options.get('interface'),
+        "OURIP": options.get('ip'),
+        "Basic": 'basic' in options,
+        "Wredirect": 'wredir' in options,
+        "NBTNSDomain": 'NBTNSdomain' in options,
+        "Finger": 'fingerprint' in options,
+        "WPAD_On_Off": 'wpad' in options,
+        "Upstream_Proxy": options.get('upstream-proxy'),
+        "Force_WPAD_Auth": 'ForceWpadAuth' in options,
+        "LM_On_Off": 'lm' in options,
+        "Verbose": 'verbose' in options,
+        "HTTP_On_Off": 'http' in options,
+        "SSL_On_Off": 'ssl' in options,
+        "WPAD_Proxy": 'wpad_proxy' in options,
+        "SMB_On_Off": 'smb' in options,
+        "Krb_On_Off": 'kerberos' in options,
+        "SQL_On_Off": 'mssql' in options,
+        "FTP_On_Off": 'ftp' in options,
+        "POP_On_Off": 'pop3' in options,
+        "LDAP_On_Off": 'ldap' in options,
+        "SMTP_On_Off": 'smtp' in options,
+        "IMAP_On_Off": 'imap' in options,
+        "DNS_On_Off": 'dns' in options,
+    }
+
+    # Process the configuration and start the servers (Not implemented yet)
+    print(config)
+
+    return redirect(url_for('network_pentesting'))
+
+
 @main_bp.route("/available_ips")
 def available_ips_page():
     gateway_ip = request.args.get('gateway_ip')

@@ -7,21 +7,34 @@ content %}
     </h1>
     <br />
     <p class="header_paragraph">
-      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nam quae quis
-      consequatur optio? Tenetur error nihil reiciendis fugit quos, mollitia
-      doloribus ipsum sunt dolores, nulla quas consequuntur molestias
-      perferendis doloremque.
+      NETH4CK is an advanced network penetration testing tool designed to
+      streamline the initial phases of internal penetration testing. It
+      simplifies the process for pentesters by automating the steps needed to
+      infiltrate into internal networks.
     </p>
     <p>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad nemo
-      praesentium voluptates quisquam sint repellendus inventore id explicabo,
-      omnis dolorem nam iste fuga exercitationem vero veniam quas. In,
-      asperiores. Exercitationem.
+      Initially, NETH4CK assists by configuring a Raspberry Pi, which, once
+      inserted into a target machine within the company, scans the internal
+      network to identify an available IP address that auto-assigns it to the
+      Raspberry Pi, integrating it into the network.
+    </p>
+    <p>
+      Once inside, NETH4CK leverages powerful enumeration techniques. It detects
+      and responds to network queries, exploiting weaknesses in protocols like
+      LLMNR, NBT-NS, and MDNS to intercept and capture critical information.
+      NETH4CK can then impersonate services, redirect traffic, and capture
+      sensitive data such as hashes and credentials, setting the stage for
+      further penetration testing efforts.
     </p>
     <br />
-    <form action="{{ url_for('main.neth4ck') }}">
-      <button class="header_button" type="submit">Launch</button>
-    </form>
+    <div style="display: flex; gap: 1rem">
+      <form action="{{ url_for('main.neth4ck') }}">
+        <button class="header_button" type="submit">Configure Interface</button>
+      </form>
+      <form action="{{ url_for('main.network_pentesting') }}">
+        <button class="header_button" type="submit">Network Pentesting</button>
+      </form>
+    </div>
   </div>
   <div class="header_image">
     <img

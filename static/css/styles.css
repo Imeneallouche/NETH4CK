@@ -61,7 +61,7 @@ body {
 }
 
 .header_content {
-  width: 50%;
+  width: 80%;
   padding-left: 50px;
 }
 
@@ -109,20 +109,26 @@ td {
 }
 
 
-input[type="radio"] {
+input[type="radio"], input[type="checkbox"]{
   appearance: none;
   width: 1rem;
   height: 1rem;
   border: 2px solid #f00;
-  border-radius: 50%;
+  /*border-radius: 50%;*/
   transition: all 0.2s ease-in-out;
 }
 
-input[type="radio"]:checked {
+input[type="radio"]:checked, input[type="checkbox"]:checked {
   border-color: #ddd;
   background-color: #f00;
 }
 
-input[type="radio"]:hover {
+input[type="radio"]:hover, input[type="checkbox"]:hover{
   cursor: pointer;
+}
+
+.box{
+  flex:1;
+  border: 1px solid #f00;
+  padding: 10px;
 }
