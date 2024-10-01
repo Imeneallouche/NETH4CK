@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&family=Josefin+Sans:wght@100;200;300;400;500;600;700&family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
 
+label {
+  display: flex;
+  align-items: center;
+}
+
 html {
   user-select: text;
   box-sizing: border-box;
@@ -108,8 +113,8 @@ td {
   border: 1px solid #f00;
 }
 
-
-input[type="radio"], input[type="checkbox"]{
+input[type="radio"],
+input[type="checkbox"] {
   appearance: none;
   width: 1rem;
   height: 1rem;
@@ -118,17 +123,42 @@ input[type="radio"], input[type="checkbox"]{
   transition: all 0.2s ease-in-out;
 }
 
-input[type="radio"]:checked, input[type="checkbox"]:checked {
+input[type="radio"]:checked,
+input[type="checkbox"]:checked {
   border-color: #ddd;
   background-color: #f00;
 }
 
-input[type="radio"]:hover, input[type="checkbox"]:hover{
+input[type="radio"]:hover,
+input[type="checkbox"]:hover {
   cursor: pointer;
 }
 
+.title-indexed {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/*
 .box{
   flex:1;
   border: 1px solid #f00;
   padding: 10px;
+}
+*/
+.responder-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rem;
+}
+
+.responder-functionality {
+  flex: 1 1 28%; /* 3 items per row */
+  min-width: 25rem;
+  max-width: 33%;
+  min-height: 15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }

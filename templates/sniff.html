@@ -1,17 +1,21 @@
 {% extends "base.html" %} {% block title %}Sniffing Interface{% endblock %} {%
 block content %}
 <div class="header" style="display: flex; flex-direction: column; gap: 1rem">
-  <div style="display: flex; align-items: center; gap: 20px">
+  <div class="title-indexed">
     <div class="tool_numbers">
       <h1>2</h1>
     </div>
     <h1>Sniffing Interface: {{ interface }}</h1>
   </div>
   <div style="width: 50%">
-    <p>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Beatae nostrum
-      minus neque consequatur provident ipsam impedit ea, suscipit et ipsa.
-      Officia optio dolore deserunt nulla aperiam! Rem aliquam eum obcaecati?
+    <p style="text-align: center">
+      the tool now intercepts network traffic passing through the selected
+      interface : {{interface}}. By analyzing captured packets, it identifies
+      those destined for external networks and extracts the IP address and
+      subnet mask of the default gateway. This information is essential for
+      determining the network configuration. In addition to that, users are
+      provided with the configuration of the machine that sent the packet
+      outside of the network
     </p>
   </div>
   <h1 id="loading">Interception loading... please wait</h1>

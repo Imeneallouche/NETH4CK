@@ -167,7 +167,7 @@ def scan_network(gateway_ip):
 #____________________________________________
 #                                           |
 #         FREE IPs IN THE LAN               |
-#  step 5: display non occupied IPs and     |
+#  step 5: display non occupied IPs         |
 #___________________________________________|
 
 @main_bp.route("/free_ips")
@@ -271,73 +271,41 @@ def network_pentesting():
 #      step 10: Configure responder functionality   |
 #___________________________________________________|
 
+# Route that handles form submissions from the HTML page
 @main_bp.route('/configure_responder', methods=['POST'])
 def configure_responder():
-    options = request.form
-    config = {
-        "Analyze": 'analyze' in options,
-        "Interface": options.get('interface'),
-        "OURIP": options.get('ip'),
-        "Basic": 'basic' in options,
-        "Wredirect": 'wredir' in options,
-        "NBTNSDomain": 'NBTNSdomain' in options,
-        "Finger": 'fingerprint' in options,
-        "WPAD_On_Off": 'wpad' in options,
-        "Upstream_Proxy": options.get('upstream-proxy'),
-        "Force_WPAD_Auth": 'ForceWpadAuth' in options,
-        "LM_On_Off": 'lm' in options,
-        "Verbose": 'verbose' in options,
-        "HTTP_On_Off": 'http' in options,
-        "SSL_On_Off": 'ssl' in options,
-        "WPAD_Proxy": 'wpad_proxy' in options,
-        "SMB_On_Off": 'smb' in options,
-        "Krb_On_Off": 'kerberos' in options,
-        "SQL_On_Off": 'mssql',
-        "FTP_On_Off": 'ftp',
-        "POP_On_Off": 'pop3',
-        "LDAP_On_Off": 'ldap',
-        "SMTP_On_Off": 'smtp',
-        "IMAP_On_Off": 'imap',
-        "DNS_On_Off": 'dns',
-    }
+    # Get the selected network interface and local IP (for OSX)
+    interface = request.form.get('interface')
+    ip = request.form.get('ip')
+    upstream_proxy = request.form.get('upstream-proxy')
 
-    responder_cmd = ['responder', '-I', config['Interface']]
-    
-    # Add the selected options to the responder command
-    if config['Analyze']: responder_cmd.append('-A')
-    if config['Basic']: responder_cmd.append('-b')
-    if config['Wredirect']: responder_cmd.append('-r')
-    if config['NBTNSDomain']: responder_cmd.append('-f')
-    if config['Finger']: responder_cmd.append('-F')
-    if config['Verbose']: responder_cmd.append('-v')
-    if config['HTTP_On_Off']: responder_cmd.append('-w')
-    if config['SSL_On_Off']: responder_cmd.append('--ssl')
-    if config['WPAD_On_Off']: responder_cmd.append('--wpad')
-    if config['SMB_On_Off']: responder_cmd.append('-s')
-    if config['Krb_On_Off']: responder_cmd.append('--krb')
-    if config['SQL_On_Off']: responder_cmd.append('--mssql')
-    if config['FTP_On_Off']: responder_cmd.append('--ftp')
-    if config['POP_On_Off']: responder_cmd.append('--pop')
-    if config['LDAP_On_Off']: responder_cmd.append('--ldap')
-    if config['SMTP_On_Off']: responder_cmd.append('--smtp')
-    if config['IMAP_On_Off']: responder_cmd.append('--imap')
-    if config['DNS_On_Off']: responder_cmd.append('--dns')
+    # Initialize a dictionary to hold the selected functionalities
+    selected_options = {}
 
-    if config['Upstream_Proxy']:
-        responder_cmd.append(f"--upstream-proxy {config['Upstream_Proxy']}")
+    # List of the checkbox options from the form
+    functionalities = [
+        "analyze",
+        "httpAuth",
+        "netbiosw",
+        "netbiosd",
+        "fingerprinting",
+        "wpads",
+        "uwpad",
+        "fwpad",
+        "flmhashing",
+        "verbose",
+    ]
 
-    if config['Force_WPAD_Auth']:
-        responder_cmd.append("--ForceWpadAuth")
+    # Check which options are selected and store them
+    for func in functionalities:
+        if request.form.get(func):
+            selected_options[func] = True  # Add functionality if selected
 
-    # Running the responder command in a thread
-    thread = threading.Thread(target=run_responder_in_thread, args=(responder_cmd,))
-    thread.start()
-
-    return redirect(url_for('network_pentesting'))
-
-# Function to run responder in a thread
-def run_responder_in_thread(cmd):
-    subprocess.run(cmd)
+    # Output the selected options for debugging purposes
+    print(f"Interface: {interface}")
+    print(f"Local IP: {ip}")
+    print(f"Upstream Proxy: {upstream_proxy}")
+    print("Selected Options: ", selected_options)
 
 
 @socketio.on('start_sniff')
