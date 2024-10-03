@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify, Response
 import psutil
 import netifaces as ni
 import threading
@@ -8,6 +8,7 @@ import nmap
 import logging
 from flask_socketio import emit
 import subprocess
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -276,36 +277,76 @@ def network_pentesting():
 def configure_responder():
     # Get the selected network interface and local IP (for OSX)
     interface = request.form.get('interface')
-    ip = request.form.get('ip')
-    upstream_proxy = request.form.get('upstream-proxy')
-
-    # Initialize a dictionary to hold the selected functionalities
-    selected_options = {}
 
     # List of the checkbox options from the form
-    functionalities = [
-        "analyze",
-        "httpAuth",
-        "netbiosw",
-        "netbiosd",
-        "fingerprinting",
-        "wpads",
-        "uwpad",
-        "fwpad",
-        "flmhashing",
-        "verbose",
-    ]
+    options = {
+        "analyze": "-A",
+        "httpAuth": "-b",
+        "dhcp": "-d",
+        "dhcpDns": "-D",
+        "wpads" : "-w",
+        "fwpad": "-F",
+        "proxyAuth": "-P",
+        "disableEss": "--disable-ess",
+        "flmhashing": "--lm",
+        "verbose": "-v",
+    }
+    
+    # Functionalities that require input
+    functionalities = {
+        'uwpad': '-u',       # Upstream Proxy for WPAD
+        'localIp': '-i',      # Local IP (for OSX)
+        'externalIp6': '-6',  # Set External IPv6 Address
+        'externalIp': '-e',   # Set External IP Address
+    }
 
-    # Check which options are selected and store them
+    # Initial Responder command with selected network interface
+    responder_command = ["sudo", "python3", "Responder.py", "-I", interface]
+
+    # Append options (flags) that don't require input
+    for func in options:
+        if request.form.get(func):
+            responder_command.append(options[func])
+
+    # Append functionalities that require input
     for func in functionalities:
         if request.form.get(func):
-            selected_options[func] = True  # Add functionality if selected
+            responder_command.append(functionalities[func])  # Append the flag (e.g., -u)
+            responder_command.append(request.form.get(func))  # Append the value (e.g., google:8080)
 
-    # Output the selected options for debugging purposes
-    print(f"Interface: {interface}")
-    print(f"Local IP: {ip}")
-    print(f"Upstream Proxy: {upstream_proxy}")
-    print("Selected Options: ", selected_options)
+    # Output the command (for debugging purposes)
+    print(f"command: {responder_command}")
+
+    # Start the Responder process in the background
+    responder_process = subprocess.Popen(responder_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    # Stream the output to the terminal HTML page
+    return Response(stream_output(responder_process), mimetype='text/plain')
+
+
+def stream_output(process):
+    """Function to stream the Responder output to the HTML page."""
+    while True:
+        output = process.stdout.readline()
+        if output == b'' and process.poll() is not None:
+            break
+        if output:
+            yield output.decode('utf-8')
+
+@main_bp.route('/stop_responder', methods=['POST'])
+def stop_responder():
+    global responder_process
+    if responder_process:
+        responder_process.terminate()  # Terminate the process
+        responder_process = None
+        return jsonify({'message': 'Responder process stopped successfully.'})
+    else:
+        return jsonify({'error': 'Responder process is not running.'})
+
+# Route to serve the HTML terminal page
+@main_bp.route('/responder_terminal')
+def responder_terminal():
+    return render_template('terminal.html')
 
 
 @socketio.on('start_sniff')

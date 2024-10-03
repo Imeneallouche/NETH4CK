@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responder Terminal</title>
+    <style>
+      body {
+        font-family: monospace;
+        background-color: #2e2e2e;
+        color: #00ff00;
+      }
+      #terminal {
+        width: 100%;
+        height: 400px;
+        background-color: #1e1e1e;
+        color: #00ff00;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #00ff00;
+        white-space: pre;
+      }
+      button {
+        background-color: #ff0000;
+        color: white;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Responder Tool Output</h1>
+    <div id="terminal"></div>
+    <button id="stopButton">Stop Responder</button>
+
+    <script>
+      const terminalDiv = document.getElementById("terminal");
+      const stopButton = document.getElementById("stopButton");
+
+      // Continuously fetch and display terminal output
+      function fetchTerminalOutput() {
+        fetch("/configure_responder", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: "interface=wlan0", // Example of sending form data
+        }).then((response) => {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          function read() {
+            reader.read().then(({ done, value }) => {
+              if (done) {
+                return;
+              }
+              terminalDiv.textContent += decoder.decode(value);
+              terminalDiv.scrollTop = terminalDiv.scrollHeight; // Auto-scroll
+              read();
+            });
+          }
+          read();
+        });
+      }
+
+      // Stop the responder tool when the button is clicked
+      stopButton.addEventListener("click", () => {
+        fetch("/stop_responder", {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert(data.message || data.error);
+          });
+      });
+
+      // Start fetching terminal output
+      fetchTerminalOutput();
+    </script>
+  </body>
+</html>

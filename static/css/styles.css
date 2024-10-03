@@ -129,6 +129,10 @@ input[type="checkbox"]:checked {
   background-color: #f00;
 }
 
+
+input[type="text"]{
+  margin: 0px 1rem;
+}
 input[type="radio"]:hover,
 input[type="checkbox"]:hover {
   cursor: pointer;
