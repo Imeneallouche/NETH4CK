@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify, Response
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, jsonify, Response, stream_with_context
 import psutil
 import netifaces as ni
 import threading
@@ -9,6 +9,9 @@ import logging
 from flask_socketio import emit
 import subprocess
 import time
+import signal
+import pty
+import os
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -266,15 +269,22 @@ def network_pentesting():
 
 
 
+# Global variable to store the Responder process
+responder_process = None
+
 #___________________________________________________
 #                                                   |
 #             RESPONDER CONFIGURATION               |
 #      step 10: Configure responder functionality   |
 #___________________________________________________|
 
-# Route that handles form submissions from the HTML page
 @main_bp.route('/configure_responder', methods=['POST'])
 def configure_responder():
+    """
+    Configure and run the Responder tool based on the user's form input.
+    """
+    global responder_process
+
     # Get the selected network interface and local IP (for OSX)
     interface = request.form.get('interface')
 
@@ -301,7 +311,7 @@ def configure_responder():
     }
 
     # Initial Responder command with selected network interface
-    responder_command = ["sudo", "python3", "Responder.py", "-I", interface]
+    responder_command = ["sudo", "responder", "-I", interface]
 
     # Append options (flags) that don't require input
     for func in options:
@@ -320,21 +330,31 @@ def configure_responder():
     # Start the Responder process in the background
     responder_process = subprocess.Popen(responder_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    # Stream the output to the terminal HTML page
-    return Response(stream_output(responder_process), mimetype='text/plain')
+    # Redirect to the terminal HTML page
+    return render_template('terminal.html')
 
+@main_bp.route('/stream_output')
+def stream_output():
+    """
+    Stream the real-time output of the Responder process to the HTML page.
+    """
+    global responder_process
+    def generate():
+        if responder_process:
+            while True:
+                output = responder_process.stdout.readline()
+                if output == b'' and responder_process.poll() is not None:
+                    break
+                if output:
+                    yield f"data: {output.decode('utf-8')}\n\n"  # Server-Sent Events (SSE) format
+    return Response(generate(), content_type='text/event-stream')
 
-def stream_output(process):
-    """Function to stream the Responder output to the HTML page."""
-    while True:
-        output = process.stdout.readline()
-        if output == b'' and process.poll() is not None:
-            break
-        if output:
-            yield output.decode('utf-8')
 
 @main_bp.route('/stop_responder', methods=['POST'])
 def stop_responder():
+    """
+    Stop the Responder process when the stop button is clicked.
+    """
     global responder_process
     if responder_process:
         responder_process.terminate()  # Terminate the process
@@ -346,7 +366,12 @@ def stop_responder():
 # Route to serve the HTML terminal page
 @main_bp.route('/responder_terminal')
 def responder_terminal():
+    """
+    Render the terminal page that will display the Responder output.
+    """
     return render_template('terminal.html')
+
+
 
 
 @socketio.on('start_sniff')

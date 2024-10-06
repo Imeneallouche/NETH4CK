@@ -1,6 +1,6 @@
 import utils
 import configparser
-
+import binascii
 from utils import *
 
 __version__ = 'Responder 2.3'
@@ -164,8 +164,8 @@ class Settings:
 			sys.exit(-1)
 
 		self.Challenge = ""
-		for i in range(0, len(self.NumChal),2):
-			self.Challenge += self.NumChal[i:i+2].decode("hex")
+		for i in range(0, len(self.NumChal), 2):
+			self.Challenge += binascii.unhexlify(self.NumChal[i:i+2])
 
 		# Set up logging
 		logging.basicConfig(filename=self.SessionLogFile, level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')

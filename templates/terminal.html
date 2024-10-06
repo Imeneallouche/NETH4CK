@@ -1,81 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Responder Terminal</title>
-    <style>
-      body {
-        font-family: monospace;
-        background-color: #2e2e2e;
-        color: #00ff00;
-      }
-      #terminal {
-        width: 100%;
-        height: 400px;
-        background-color: #1e1e1e;
-        color: #00ff00;
-        overflow-y: auto;
-        padding: 10px;
-        border: 1px solid #00ff00;
-        white-space: pre;
-      }
-      button {
-        background-color: #ff0000;
-        color: white;
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Responder Tool Output</h1>
-    <div id="terminal"></div>
-    <button id="stopButton">Stop Responder</button>
+{% extends "base.html" %} {% block title %}Responder Terminal{% endblock %} {%
+block content %}
+<div class="header" style="display: flex; flex-direction: column">
+  <div class="title-indexed">
+    <div class="tool_numbers">
+      <h1>10</h1>
+      <!-- This number can be adjusted depending on the section number -->
+    </div>
+    <h1>Responder Terminal Output</h1>
+  </div>
 
-    <script>
-      const terminalDiv = document.getElementById("terminal");
-      const stopButton = document.getElementById("stopButton");
+  <div style="width: 80%; margin: 20px auto">
+    <p style="text-align: center">
+      This terminal shows real-time output from the Responder tool as it
+      performs the network attack tests. You can stop the Responder process at
+      any time using the provided button.
+    </p>
+  </div>
 
-      // Continuously fetch and display terminal output
-      function fetchTerminalOutput() {
-        fetch("/configure_responder", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: "interface=wlan0", // Example of sending form data
-        }).then((response) => {
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-          function read() {
-            reader.read().then(({ done, value }) => {
-              if (done) {
-                return;
-              }
-              terminalDiv.textContent += decoder.decode(value);
-              terminalDiv.scrollTop = terminalDiv.scrollHeight; // Auto-scroll
-              read();
-            });
-          }
-          read();
-        });
-      }
+  <div
+    class="terminal-output"
+    style="
+      background-color: #333;
+      color: #00ff00;
+      padding: 20px;
+      height: 400px;
+      overflow-y: scroll;
+      white-space: pre-wrap;
+    "
+  >
+    <h3>Terminal Output:</h3>
+    <div id="responder_output"></div>
+  </div>
 
-      // Stop the responder tool when the button is clicked
-      stopButton.addEventListener("click", () => {
-        fetch("/stop_responder", {
-          method: "POST",
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            alert(data.message || data.error);
-          });
+  <button id="stop_button" class="header_button" style="margin-top: 20px">
+    Stop Responder
+  </button>
+  <div
+    id="feedback_message"
+    style="color: red; text-align: center; margin-top: 10px"
+  ></div>
+</div>
+
+<script>
+  const eventSource = new EventSource("{{ url_for('main.stream_output') }}");
+  const stopButton = document.getElementById("stop_button");
+  const feedbackMessage = document.getElementById("feedback_message");
+
+  eventSource.onmessage = function (event) {
+    const outputDiv = document.getElementById("responder_output");
+    const newOutput = document.createElement("p");
+    newOutput.textContent = event.data;
+    outputDiv.appendChild(newOutput);
+    // Automatically scroll down as new output comes in
+    outputDiv.scrollTop = outputDiv.scrollHeight;
+  };
+
+  stopButton.addEventListener("click", function () {
+    fetch("{{ url_for('main.stop_responder') }}", { method: "POST" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          feedbackMessage.textContent = data.message;
+          stopButton.disabled = true; // Disable the button once stopped
+          eventSource.close(); // Close the stream when Responder is stopped
+        } else if (data.error) {
+          feedbackMessage.textContent = data.error;
+        }
+      })
+      .catch((error) => {
+        feedbackMessage.textContent = "An error occurred: " + error.message;
       });
-
-      // Start fetching terminal output
-      fetchTerminalOutput();
-    </script>
-  </body>
-</html>
+  });
+</script>
+{% endblock %}

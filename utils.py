@@ -12,22 +12,6 @@ except:
 	print("Please install python-sqlite3 extension.")
 	sys.exit(0)
 
-def color(txt, code = 1, modifier = 0):
-	if txt.startswith('[*]'):
-		settings.Config.PoisonersLogger.warning(txt)
-	elif 'Analyze' in txt:
-		settings.Config.AnalyzeLogger.warning(txt)
-
-	if os.name == 'nt':  # No colors for windows...
-		return txt
-	return "\033[%d;3%dm%s\033[0m" % (modifier, code, txt)
-
-def text(txt):
-	logging.info(txt)
-	if os.name == 'nt':
-		return txt
-	return '\r' + re.sub(r'\[([^]]*)\]', "\033[1;34m[\\1]\033[0m", txt)
-
 
 def IsOnTheSameSubnet(ip, net):
 	net += '/24'
